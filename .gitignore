@@ -16,3 +16,44 @@ bin-release/
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
 # should NOT be excluded as they contain compiler settings and other important
 # information for Eclipse / Flash Builder.
+
+# Object files
+*.o
+
+# ELF binary files
+*.elf
+
+# ISO files
+*.iso
+
+# Generated Assembly files
+*.s
+
+# Compiled object files
+*.out
+*.a
+*.so
+
+# Other common build artifacts
+*.d
+*.dSYM/
+*.ko
+*.mod
+*.cmd
+*.tmp
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Directories for temporary files
+tmp/
+temp/
+
+# Editor temporary files
+*~
+\#*#
+
