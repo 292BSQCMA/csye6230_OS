@@ -1,7 +1,11 @@
-ENTRY(loader)                /* the name of the entry label */
+ENTRY(loader)
 
 SECTIONS {
     . = 0x00100000;          /* the code should be loaded at 1 MB */
+
+    .multiboot ALIGN(4) : {
+        *(.multiboot)
+    }
 
     .text ALIGN (0x1000) :   /* align at 4 KB */
     {
