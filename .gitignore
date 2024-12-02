@@ -64,3 +64,8 @@ Thumbs.db
 *.swo
 *.bak
 *.old
+
+# VirtualBox VM artifacts
+*.vdi
+*.vbox
+*.vbox-prev
