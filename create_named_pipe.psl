@@ -1,0 +1,15 @@
+# Define the named pipe
+$pipeName = "\\.\pipe\serial"
+
+# Create the named pipe
+$pipe = New-Object System.IO.Pipes.NamedPipeServerStream($pipeName, [System.IO.Pipes.PipeDirection]::InOut, 1, [System.IO.Pipes.PipeTransmissionMode]::Byte, [System.IO.Pipes.PipeOptions]::None)
+
+# Wait for a client to connect
+$pipe.WaitForConnection()
+
+# Notify that the pipe has been created
+Write-Output "Named pipe created: $pipeName"
+
+# Keep the script running to maintain the pipe
+Start-Sleep -Seconds 3600
+

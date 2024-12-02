@@ -1,9 +1,17 @@
-# csye6230_OS
-creating os from scratch, following "https://littleosbook.github.io/"
+# CSYE6230 Custom OS Project
 
-# Custom OS Project
+Creating an OS from scratch, following [The little book about OS development](https://littleosbook.github.io/).
 
-This repository contains the source code and build instructions for a custom operating system.
+## Authors
+- **Shen Wang**: wang.shen3@northeastern.edu
+- **Xingxing Xiao**: xiao.xingx@northeastern.edu
+- **Hsuanpei Lee**: lee.hsua@northeastern.edu
+
+## Instructor
+- **Professor Ahmed Banafa**: a.banafa@northeastern.edu 
+
+## Course
+CSYE6230 21600 Operating Systems SEC 01 Fall 2024
 
 ## Prerequisites
 - Bochs x86 Emulator
@@ -13,7 +21,22 @@ This repository contains the source code and build instructions for a custom ope
 - NASM Assembler
 
 ## Building the OS
-1. Follow the tutorial at [The little book about OS development](https://littleosbook.github.io/) up to section 2.3.4 to create `os.iso`.
+1. **Install Required Packages**:
+    ```sh
+    sudo apt-get install build-essential nasm genisoimage
+    ```
+
+2. **Clone the Repository**:
+    ```sh
+    git clone https://github.com/your-repo/csye6230_OS.git
+    cd csye6230_OS
+    ```
+
+3. **Build the OS**:
+    ```sh
+    make
+    ```
+
 
 ## Running the OS
 
@@ -24,168 +47,78 @@ This repository contains the source code and build instructions for a custom ope
 4. Start the virtual machine.
 
 
-## Detailed Steps for Building and Running the OS
-### Step 1: Install Required Packages
-sudo apt-get install build-essential nasm genisoimage
-## Step 2: Create the Loader
-### Save the following code in a file called loader.s:
-global loader                   ; the entry symbol for ELF
 
-MAGIC_NUMBER equ 0x1BADB002     ; define the magic number constant
-FLAGS        equ 0x0            ; multiboot flags
-CHECKSUM     equ -MAGIC_NUMBER  ; calculate the checksum
-                                    ; (magic number + checksum + flags should equal 0)
+## Chapter-wise Explanation of the Files Corresponding to Each Chapter
 
-section .text:                  ; start of the text (code) section
-align 4                         ; the code must be 4 byte aligned
-    dd MAGIC_NUMBER             ; write the magic number to the machine code,
-    dd FLAGS                    ; the flags,
-    dd CHECKSUM                 ; and the checksum
+### Chapter 2: First Steps
+- **Booting**: Initial setup and booting process.
+- **Hello Cafebabe**: Bootloader and initial boot message.
+- **Files**: `loader.s`, `multiboot_header.s`, `link.ld`
 
-loader:                         ; the loader label (defined as entry point in linker script)
-    mov eax, 0xCAFEBABE         ; place the number 0xCAFEBABE in the register eax
-.loop:
-    jmp .loop                   ; loop forever
-## Step 3: Compile the Loader
-### Compile the file loader.s into a 32-bit ELF object file:
-nasm -f elf32 loader.s
-## Step 4: Create the Linker Script
-### Save the following linker script into a file called link.ld:
-ENTRY(loader)                /* the name of the entry label */
+### Chapter 3: Getting to C
+- **Setting Up a Stack**: Basic stack setup for function calls.
+- **Calling C Code From Assembly**: Integration between assembly and C code.
+- **Files**: `kmain.c` (setup and calling C from assembly)
 
-SECTIONS {
-    . = 0x00100000;          /* the code should be loaded at 1 MB */
+### Chapter 4: Output
+- **Interacting with the Hardware**: Basic hardware interaction.
+    - Understanding how to communicate with hardware using I/O ports and memory-mapped I/O.
+- **Framebuffer**: Writing text and moving the cursor.
+    - Implementing functions to write text to the screen and move the cursor using the framebuffer.
+- **Serial Ports**: Serial port communication.
+    - Configuring and using serial ports for debugging and output.
+- **Files**: `fb.c`, `serial.c`, `fb.h`, `serial.h`
 
-    .text ALIGN (0x1000) :   /* align at 4 KB */
-    {
-        *(.text)             /* all text sections from all files */
-    }
+### Chapter 5: Segmentation
+- **Global Descriptor Table (GDT)**: Setup and loading the GDT.
+    - Defining and loading the GDT to manage memory segments.
+- **Files**: `gdt.c`, `gdt_flush.s`, `gdt.h`
 
-    .rodata ALIGN (0x1000) : /* align at 4 KB */
-    {
-        *(.rodata*)          /* all read-only data sections from all files */
-    }
+### Chapter 6: Interrupts and Input
+- **Interrupt Handlers**: Setting up and handling interrupts.
+    - Creating and managing interrupt service routines (ISRs) to handle hardware and software interrupts.
+- **Interrupt Descriptor Table (IDT)**: Setup and loading the IDT.
+    - Defining and loading the IDT to manage interrupt vectors.
+- **Programmable Interrupt Controller (PIC)**: Managing hardware interrupts.
+    - Configuring the PIC to handle hardware interrupts.
+- **Keyboard Input**: Reading input from the keyboard.
+    - Implementing functions to read and process keyboard input.
+- **Files**: `idt.c`, `idt_load.s`, `keyboard.c`, `idt.h`, `keyboard.h`
 
-    .data ALIGN (0x1000) :   /* align at 4 KB */
-    {
-        *(.data)             /* all data sections from all files */
-    }
+### Chapter 9: Paging
+- **Paging in x86**: Implementing paging.
+    - Setting up paging to manage virtual memory and improve security and efficiency.
+- **Files**: `paging.c`, `paging.h`
 
-    .bss ALIGN (0x1000) :    /* align at 4 KB */
-    {
-        *(COMMON)            /* all COMMON sections from all files */
-        *(.bss)              /* all bss sections from all files */
-    }
-}
-### Link the executable:
-ld -T link.ld -melf_i386 loader.o -o kernel.elf
-## Step 5: Download the Bootloader
-### Download the binary file from stage2_eltorito and copy it to the folder containing loader.s and link.ld.
+### Chapter 12: File Systems
+- **Implementing a Simple File System**: Basic file system operations.
+    - Creating, deleting, renaming, and listing files and directories.
+- **Files**: `fs.c`, `fs.h`
 
-## Step 6: Create the ISO Structure
-mkdir -p iso/boot/grub              # create the folder structure
-cp stage2_eltorito iso/boot/grub/   # copy the bootloader
-cp kernel.elf iso/boot/             # copy the kernel
-## Create a menu.lst file for GRUB:
-default=0
-timeout=0
+### Chapter 8: Shell
+- **Interactive Shell**: Command-line interface to interact with the OS.
+    - Implementing a basic shell to process user commands and interact with the file system.
+- **Files**: `shell.c`, `shell.h`
 
-title os
-kernel /boot/kernel.elf
-### place the menu.lst file in the folder iso/boot/grub/.
+## Commands Introduction
 
-## Step 7: Generate the ISO Image
-genisoimage -R                              \
-            -b boot/grub/stage2_eltorito    \
-            -no-emul-boot                   \
-            -boot-load-size 4               \
-            -A os                           \
-            -input-charset utf8             \
-            -quiet                          \
-            -boot-info-table                \
-            -o os.iso                       \
-            iso
-## Step 8: Running the OS in VirtualBox
-### 1. Open VirtualBox and create a new virtual machine.
-
-### 2. Set the boot order to boot from the CD/DVD drive first.
-
-### 3. Mount the os.iso file as a virtual CD/DVD drive.
-
-### 4. Start the virtual machine.
-
-## Expected Output
-### When running the OS in VirtualBox, you should see the following message:
-
-Booting 'os' 
-kernel /boot/kernel.elf [Multiboot-elf, <0x100000:0x13:0x0>, shtab=0x1010cb, entry=0x10000c]
+### Available Commands:
+- **lst**: Lists the contents of the current directory.
+- **mkd <directory_name>**: Creates a new directory with the specified name in the current directory.
+- **mkf <file_name>**: Creates a new file with the specified name in the current directory.
+- **del <file_or_directory_name>**: Deletes the specified file or directory.
+- **rnm <old_name> <new_name>**: Renames the specified file or directory.
+- **cwd**: Displays the current working directory.
+- **chd <directory_name>**: Changes the current working directory to the specified directory.
 
 
 
+## License
+Currently, this project has no License.
 
-## from Chapter 4: Output
 
-### Key Concepts
+## Contact
+For any inquiries, please contact wang.shen3@northeastern.edu.
 
-1. **Interacting with Hardware**:
-   - **Memory-Mapped I/O**: Writing to specific memory addresses updates the hardware. Example: Framebuffer at `0x000B8000`.
-   - **I/O Ports**: Using assembly instructions `in` and `out` to communicate with hardware. Example: Controlling the cursor on the screen.
-
-2. **Framebuffer**:
-   - **Text Display**: Writing text to the console using memory-mapped I/O.
-   - **Cursor Movement**: Moving the cursor using I/O ports `0x3D4` and `0x3D5`.
-   - **Driver**: Abstracts low-level hardware interaction, providing a higher-level interface for the OS.
-
-3. **Serial Ports**:
-   - **Baud Rate**: Setting the speed of data transmission.
-   - **Line Configuration**: Setting data length, parity, and stop bits.
-   - **FIFO Buffers**: Managing data transmission using buffers.
-   - **Modem Configuration**: Hardware flow control via RTS and DTR signals.
-   - **Reading/Writing Data**: Ensuring the transmit FIFO is empty before sending data.
-
-### Implementation Steps
-
-1. **Framebuffer Implementation**:
-   - Create functions to write text and move the cursor:
-     ```c
-     void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg);
-     void fb_move_cursor(unsigned short pos);
-     int write(char *buf, unsigned int len);
-     ```
-   - Update `kmain` to use the framebuffer functions.
-
-2. **Serial Port Configuration**:
-   - Set up serial port configuration and data transmission:
-     ```c
-     void serial_configure_baud_rate(unsigned short com, unsigned short divisor);
-     void serial_configure_line(unsigned short com);
-     void serial_configure_buffers(unsigned short com);
-     void serial_configure_modem(unsigned short com);
-     int serial_is_transmit_fifo_empty(unsigned int com);
-     void serial_write(char *buf, unsigned int len);
-     ```
-   - Add debug messages via `serial_write` to trace execution.
-
-3. **Multiboot Header**:
-   - Ensure the kernel is Multiboot-compliant by adding a Multiboot header in assembly:
-     ```assembly
-     section .multiboot
-     align 4
-     dd 0x1BADB002
-     dd 0x00
-     dd -(0x1BADB002 + 0x00)
-     section .text
-     global loader
-     ```
-
-4. **Update Linker Script**:
-   - Include the `.multiboot` section in the linker script:
-     ```ld
-     SECTIONS {
-         . = 0x00100000;
-
-         .multiboot ALIGN(4) : { *(.multiboot) }
-
-         .text ALIGN (0x1000) : { *(.text) }
-         .rodata ALIGN (0x1000) : { *(.rodata*) }
-         .data ALIGN (0x1000) :
+## Acknowledgments 
+This project was created with the assistance of Microsoft Copilot, an AI companion by Microsoft, which provided guidance and support throughout the development process.

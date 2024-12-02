@@ -24,16 +24,17 @@ void serial_configure_buffers(unsigned short com) {
 }
 
 void serial_configure_modem(unsigned short com) {
-    outb(SERIAL_MODEM_COMMAND_PORT(com), 0x03);
-}
-
-int serial_is_transmit_fifo_empty(unsigned int com) {
-    return inb(SERIAL_LINE_STATUS_PORT(com)) & 0x20;
+    outb(SERIAL_MODEM_COMMAND_PORT(com), 0x0B);
 }
 
 void serial_write(char *buf, unsigned int len) {
     for (unsigned int i = 0; i < len; i++) {
-        while (!serial_is_transmit_fifo_empty(SERIAL_COM1_BASE));
-        outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), buf[i]);
+        while (!(inb(SERIAL_LINE_STATUS_PORT(SERIAL_COM1_BASE)) & 0x20));
+        outb(SERIAL_COM1_BASE, buf[i]);
     }
+}
+
+char serial_read() {
+    while (!(inb(SERIAL_LINE_STATUS_PORT(SERIAL_COM1_BASE)) & 1));
+    return inb(SERIAL_COM1_BASE);
 }
