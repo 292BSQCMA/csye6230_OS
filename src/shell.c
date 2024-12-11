@@ -65,7 +65,19 @@ void shell() {
         } else if (strncmp(input, "chd ", 4) == 0) {
             fs_cd(input + 4);
             write("Directory changed.\n", 20);
-        } else {
+        } else if (strncmp(input, "mov ", 4) == 0) {
+            char* src = input + 4;
+            char* dest = strchr(src, ' ');
+            if (dest != NULL) {
+                *dest = '\0';
+                dest++;
+                fs_move(src, dest, fs_current);
+                write("File/directory moved.\n", 21);
+            }
+            else {
+                write("Usage: mov <source> <destination>\n", 35);
+            }
+        }else {
             write("Unknown command: ", 17);
             write(input, strlen(input));
             write("\n", 1);
